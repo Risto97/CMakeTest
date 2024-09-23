@@ -36,6 +36,9 @@ include(cmakepp_lang/cmakepp_lang)
 #                              test names, but increases the chance of name
 #                              collisions.
 # :type USE_REL_PATH_NAMES: bool
+# :keyword LABEL: CTest label for all the tests in the directory.
+#                 Run a group of labeled tests with `ctest -L <label>`
+# :type LABEL: str
 # :keyword CMAKE_OPTIONS: List of additional CMake options to be
 #                         passed to all test invocations. Options
 #                         should follow the syntax:
@@ -49,7 +52,7 @@ function(ct_add_dir _ad_test_dir)
     #       in cmake/cmake_test/templates/test_project_CMakeLists.txt.in).
     #       I propose renaming it to something like "ENABLE_DEBUG_MODE_IN_TESTS".
     set(_ad_options CT_DEBUG_MODE_ON USE_REL_PATH_NAMES)
-    cmake_parse_arguments(PARSE_ARGV 1 ADD_DIR "${_ad_options}" "" "${_ad_multi_value_args}")
+    cmake_parse_arguments(PARSE_ARGV 1 ADD_DIR "${_ad_options}" "LABEL" "${_ad_multi_value_args}")
 
     # This variable will be picked up by the template
     # TODO: This variable should be made Config File-specific and may end up
@@ -168,5 +171,8 @@ function(ct_add_dir _ad_test_dir)
                 -B "${_ad_test_dest_full_path}"
                 ${ADD_DIR_CMAKE_OPTIONS}
         )
+        if(ADD_DIR_LABEL)
+            set_property(TEST ${_ad_test_name} PROPERTY LABELS ${ADD_DIR_LABEL})
+        endif()
     endforeach()
 endfunction()
